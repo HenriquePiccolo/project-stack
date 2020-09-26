@@ -72,7 +72,7 @@ resource "aws_instance" "web" {
 
   count = 1
 
-  subnet_id              = "${random_shuffle.random_subnet.result[0]}"
+  subnet_id              = random_shuffle.random_subnet.result[0]
   vpc_security_group_ids = ["${aws_security_group.allow-ssh.id}"]
   key_name               = var.KEY_NAME
   iam_instance_profile   = "${aws_iam_instance_profile.ecr_readOnly_profile.name}"
