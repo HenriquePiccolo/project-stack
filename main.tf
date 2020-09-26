@@ -1,12 +1,12 @@
 # Specify the provider and access details
 provider "aws" {
-  region = "${var.aws_region}"
+  region = var.aws_region
 }
 
 data "template_file" "script" {
   template = "${file("${path.module}/script.sh.tpl")}"
   vars = {
-    ECR_REGISTRY = "${var.ECR_REGISTRY}"
+    ECR_REGISTRY = var.ECR_REGISTRY
   }
 }
 
@@ -17,7 +17,7 @@ variable "project" {
 
 data "aws_vpc" "vpc" {
   tags = {
-    Name = "${var.project}"
+    Name = var.project
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_instance" "web" {
 
   subnet_id              = "${random_shuffle.random_subnet.result[0]}"
   vpc_security_group_ids = ["${aws_security_group.allow-ssh.id}"]
-  key_name               = "${var.KEY_NAME}"
+  key_name               = var.KEY_NAME
   iam_instance_profile   = "${aws_iam_instance_profile.ecr_readOnly_profile.name}"
 
   provisioner "file" {
