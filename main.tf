@@ -68,7 +68,7 @@ resource "aws_elb" "web" {
 
 resource "aws_instance" "web" {
   instance_type = "t2.micro"
-  ami           = "${lookup(var.aws_amis, var.aws_region)}"
+  ami           = lookup(var.aws_amis, var.aws_region)
 
   count = 1
 
@@ -90,8 +90,8 @@ resource "aws_instance" "web" {
   }
 
   connection {
-    user        = "${var.INSTANCE_USERNAME}"
-    private_key = "${file("${var.PATH_TO_KEY}")}"
+    user        = var.INSTANCE_USERNAME
+    private_key = file(var.PATH_TO_KEY)
     host = "${self.public_dns}"
   }
 
