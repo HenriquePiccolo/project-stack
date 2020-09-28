@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 data "template_file" "script" {
-  template = "${file("${path.module}/script.sh.tpl")}"
+  template = file("${path.module}/script.sh.tpl")
   vars = {
     ECR_REGISTRY = var.ECR_REGISTRY
   }
@@ -22,7 +22,7 @@ data "aws_vpc" "vpc" {
 }
 
 data "aws_subnet_ids" "all" {
-  vpc_id = "${data.aws_vpc.vpc.id}"
+  vpc_id = data.aws_vpc.vpc.id
 
   tags = {
     Tier = "Public"
@@ -45,7 +45,7 @@ resource "aws_elb" "web" {
   name = "hackton-elb"
 
   subnets         = data.aws_subnet_ids.all.ids
-  security_groups = ["${aws_security_group.allow-ssh.id}"]
+  security_groups = [aws_security_group.allow-ssh.id]
 
   listener {
     instance_port     = 80
@@ -73,12 +73,12 @@ resource "aws_instance" "web" {
   count = 1
 
   subnet_id              = random_shuffle.random_subnet.result[0]
-  vpc_security_group_ids = ["${aws_security_group.allow-ssh.id}"]
+  vpc_security_group_ids = [aws_security_group.allow-ssh.id]
   key_name               = var.KEY_NAME
-  iam_instance_profile   = "${aws_iam_instance_profile.ecr_readOnly_profile.name}"
+  iam_instance_profile   = aws_iam_instance_profile.ecr_readOnly_profile.name
 
   provisioner "file" {
-    content      = "${data.template_file.script.rendered}"
+    content      = data.template_file.script.rendered
     destination = "$(pwd)/script.sh"
   }
 
@@ -96,6 +96,6 @@ resource "aws_instance" "web" {
   }
 
   tags = {
-    Name = "${format("nginx-hackaton-%03d", count.index + 1)}"
+    Name = format("nginx-hackaton-%03d", count.index + 1)
   }
 }
